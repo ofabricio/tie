@@ -2,7 +2,7 @@
 
 This is enough: a simple http handler utility.
 
-[![Go](https://github.com/ofabricio/tie/actions/workflows/go.yml/badge.svg)](https://github.com/ofabricio/tie/actions/workflows/go.yml)
+[![Go](https://github.com/ofabricio/tie/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/ofabricio/tie/actions/workflows/go.yml)
 
 ## Example
 
@@ -17,7 +17,7 @@ func HandlerExample(w http.ResponseWriter, r *http.Request) {
 
     u.Bind(&payload)
 
-    u.Json(http.StatusOk, map[string]string{"name": payload.Name})
+    u.Write(http.StatusOk, tie.Json(&payload))
 }
 ```
 
