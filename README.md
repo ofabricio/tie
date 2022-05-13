@@ -7,6 +7,9 @@ This is enough: a simple http handler utility.
 ## Example
 
 ```go
+import "github.com/ofabricio/tie"
+import "github.com/ofabricio/tie/json"
+
 func HandlerExample(w http.ResponseWriter, r *http.Request) {
 
     var payload struct {
@@ -17,7 +20,7 @@ func HandlerExample(w http.ResponseWriter, r *http.Request) {
 
     u.Bind(&payload)
 
-    u.Write(http.StatusOk, tie.Json(&payload))
+    u.Write(http.StatusOk, json.Body(&payload))
 }
 ```
 
