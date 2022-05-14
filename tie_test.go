@@ -1,89 +1,36 @@
 package tie_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
 
 	"github.com/ofabricio/tie"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestBind(t *testing.T) {
-
-	// Given.
-
-	r := httptest.NewRequest(http.MethodGet, "/", strings.NewReader(`{"name":"mary"}`))
-
-	u := tie.New(nil, r)
+func Example() {
 
 	var payload struct {
 		Name string `json:"name"`
 	}
 
-	// When.
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/users/123?type=ADM", strings.NewReader(`{ "name": "Mary" }`))
+	r.Header.Set("X-Version", "1")
 
-	err := u.Bind(&payload)
+	u := tie.New(w, r)
 
-	// Then.
+	fmt.Println("Query:", u.Query("type"))
+	fmt.Println("Header:", u.Head("X-Version"))
+	fmt.Println("PathSeg:", u.PathSeg(0))
+	u.Bind(&payload)
 
-	assert.Nil(t, err)
-	assert.Equal(t, "mary", payload.Name)
-}
+	fmt.Println("Body:", payload.Name)
 
-func TestQuery(t *testing.T) {
-
-	// Given.
-
-	r := httptest.NewRequest(http.MethodGet, "/?name=mary", nil)
-
-	u := tie.New(nil, r)
-
-	// When.
-
-	name := u.Query("name")
-
-	// Then.
-
-	assert.Equal(t, "mary", name)
-}
-
-func TestPathSeg(t *testing.T) {
-
-	// Given.
-
-	tt := []struct {
-		give string
-		when int
-		then string
-	}{
-		{give: "a", when: 0, then: "a"},
-		{give: "a", when: 1, then: ""},
-		{give: "a/", when: 0, then: "a"},
-		{give: "a/", when: 1, then: ""},
-		{give: "/a/", when: 0, then: "a"},
-		{give: "/a/", when: 1, then: ""},
-		{give: "/a", when: 0, then: "a"},
-		{give: "/a", when: 1, then: ""},
-		{give: "a/b", when: 0, then: "a"},
-		{give: "a/b", when: 1, then: "b"},
-		{give: "a/b", when: 2, then: ""},
-		{give: "a/b/c", when: 2, then: "c"},
-	}
-
-	for _, tc := range tt {
-
-		r := httptest.NewRequest(http.MethodGet, "/"+tc.give, nil)
-
-		u := tie.New(nil, r)
-
-		// When.
-
-		seg := u.PathSeg(tc.when)
-
-		// Then.
-
-		assert.Equal(t, tc.then, seg, tc.give)
-	}
+	// Output:
+	// Query: ADM
+	// Header: 1
+	// PathSeg: users
+	// Body: Mary
 }

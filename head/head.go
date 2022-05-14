@@ -1,12 +1,17 @@
 package head
 
-import "github.com/ofabricio/tie"
+import (
+	"net/http"
 
-func With(kv ...string) tie.WriteFunc {
-	return func(c *tie.WriteConfig) {
+	"github.com/ofabricio/tie/opt"
+)
+
+func With(kv ...string) opt.WriteFunc {
+	return func(h http.Header) opt.BodyFunc {
 		for i := 0; i < len(kv); i += 2 {
 			k, v := kv[i+0], kv[i+1]
-			c.Head.Set(k, v)
+			h.Set(k, v)
 		}
+		return nil
 	}
 }

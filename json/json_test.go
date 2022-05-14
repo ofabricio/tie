@@ -3,10 +3,11 @@ package json_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
-	"github.com/ofabricio/tie"
 	"github.com/ofabricio/tie/json"
+	"github.com/ofabricio/tie/opt"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestBody_With_Msg(t *testing.T) {
 
 	tt := []struct {
 		name string
-		when tie.WriteFunc
+		when opt.WriteFunc
 		then string
 	}{
 		{
@@ -25,7 +26,7 @@ func TestBody_With_Msg(t *testing.T) {
 			then: `{ "message": "hi" }`,
 		},
 		{
-			name: "JsonKV",
+			name: "With",
 			when: json.With("field_a", "value_a", "field_b", "value_b"),
 			then: `{ "field_a": "value_a", "field_b": "value_b" }`,
 		},
@@ -40,16 +41,13 @@ func TestBody_With_Msg(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		u := tie.New(w, nil)
-
 		// When.
 
-		err := u.Write(http.StatusCreated, tc.when)
+		err := tc.when(w.Header())(w)
 
 		// Then.
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusCreated, w.Code)
 		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 		assert.JSONEq(t, tc.then, w.Body.String())
 	}
@@ -65,8 +63,6 @@ func TestND(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	u := tie.New(w, nil)
-
 	ch := make(chan *Payload)
 	go func() {
 		ch <- &Payload{Name: "Mary"}
@@ -76,12 +72,57 @@ func TestND(t *testing.T) {
 
 	// When.
 
-	err := u.Write(http.StatusCreated, json.ND(ch))
+	err := json.ND(ch)(w.Header())(w)
 
 	// Then.
 
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Equal(t, "application/x-ndjson; charset=utf-8", w.Header().Get("Content-Type"))
 	assert.Equal(t, "{\"name\":\"Mary\"}\n{\"name\":\"John\"}\n", w.Body.String())
+}
+
+func TestBind(t *testing.T) {
+
+	// Given.
+
+	var payload struct {
+		Name string `json:"name"`
+	}
+
+	r := httptest.NewRequest(http.MethodPut, "/", strings.NewReader(`{ "name": "Mary" }`))
+
+	// When.
+
+	err := json.Bind(&payload)(r)
+
+	// Then.
+
+	assert.Nil(t, err)
+	assert.Equal(t, "Mary", payload.Name)
+}
+
+func TestBindND(t *testing.T) {
+
+	// Given.
+
+	type payload struct {
+		Name string `json:"name"`
+	}
+
+	r := httptest.NewRequest(http.MethodPut, "/",
+		strings.NewReader("{\"name\":\"Mary\"}\n{\"name\":\"John\"}"))
+
+	ch := make(chan payload)
+
+	// When.
+
+	go json.BindND(ch)(r)
+
+	a := <-ch
+	b := <-ch
+
+	// Then.
+
+	assert.Equal(t, "Mary", a.Name)
+	assert.Equal(t, "John", b.Name)
 }
