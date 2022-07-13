@@ -1,16 +1,9 @@
 package k
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
-)
-
-var (
-	ErrRequiredKey  = fmt.Errorf("required")
-	ErrInvalidValue = fmt.Errorf("not a valid value")
-	ErrInvalidTime  = fmt.Errorf("not a valid time layout")
 )
 
 type Val string
@@ -19,35 +12,34 @@ func (v Val) Str() string {
 	return string(v)
 }
 
-func (v Val) Split() []string {
-	return strings.Split(string(v), ",")
+func (v Val) Split(sep string) []string {
+	if v.Empty() {
+		return nil
+	}
+	return strings.Split(string(v), sep)
 }
 
 func (v Val) Int() (int, error) {
-	if v == "" {
+	if v.Empty() {
 		return 0, nil
 	}
-	i, err := strconv.Atoi(string(v))
-	if err != nil {
-		return i, ErrInvalidValue
-	}
-	return i, nil
+	return strconv.Atoi(string(v))
 }
 
 func (v Val) Time(layout string) (time.Time, error) {
-	if v == "" {
+	if v.Empty() {
 		return time.Time{}, nil
 	}
-	t, err := time.Parse(layout, string(v))
-	if err != nil {
-		return t, ErrInvalidTime
-	}
-	return t, nil
+	return time.Parse(layout, string(v))
 }
 
-func (v Val) required() error {
-	if v == "" {
-		return ErrRequiredKey
+func (v Val) Default(def string) Val {
+	if v.Empty() {
+		return Val(def)
 	}
-	return nil
+	return v
+}
+
+func (v Val) Empty() bool {
+	return v == ""
 }

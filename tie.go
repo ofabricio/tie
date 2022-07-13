@@ -13,11 +13,11 @@ func New(w http.ResponseWriter, r *http.Request) Tied {
 }
 
 func (t *Tied) Query(name string) string {
-	return u.Query(t.r).Str(name)
+	return u.Query(t.r).Name(name).Str()
 }
 
 func (t *Tied) Head(name string) string {
-	return u.Head(t.r).Str(name)
+	return u.Head(t.r).Name(name).Str()
 }
 
 // PathSeg returns the URL path segment by its zero-based id.

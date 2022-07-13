@@ -45,7 +45,7 @@ func TestHead(t *testing.T) {
 
 	// When.
 
-	v := u.Head(r).Int("X-Version")
+	v := u.Head(r).Name("X-Version").Int()
 
 	// Then.
 

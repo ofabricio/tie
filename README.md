@@ -101,11 +101,11 @@ func Example(w http.ResponseWriter, r *http.Request) {
     q := u.Query(r)
 
     p := Payload {
-        ID:   q.Required("id").Int(),
-        Name: q.Str("name"),
-        Port: q.Int("port"),
-        List: q.Split("list").Values(),
-        Date: q.Time("date", time.Kitchen),
+        ID:   q.Name("id").Required().Int(),
+        Name: q.Name("name").Str(),
+        Port: q.Name("port").Int(),
+        List: q.Name("list").Split(),
+        Date: q.Name("date").Time(time.Kitchen),
     }
 
     if q.Err != nil {
@@ -127,9 +127,9 @@ func Example(w http.ResponseWriter, r *http.Request) {
     h := u.Head(r)
 
     p := Payload {
-        Cntt: h.Required("Content-Type").Str(),
-        Data: h.Int("X-Data"),
-        Date: h.Time("X-Date", time.Kitchen),
+        Cntt: h.Name("Content-Type").Required().Str(),
+        Data: h.Name("X-Data").Int(),
+        Date: h.Name("X-Date").Time(time.Kitchen),
     }
 
     if h.Err != nil {
