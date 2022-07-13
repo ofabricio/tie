@@ -78,6 +78,38 @@ func TestParamInt(t *testing.T) {
 	}
 }
 
+func TestParamIntClamp(t *testing.T) {
+
+	// Given.
+
+	tt := []struct {
+		url string
+		exp int
+	}{
+		{url: "/", exp: 5},
+		{url: "/?a=", exp: 5},
+		{url: "/?a=1", exp: 5},
+		{url: "/?a=5", exp: 5},
+		{url: "/?a=8", exp: 8},
+		{url: "/?a=10", exp: 10},
+		{url: "/?a=11", exp: 10},
+	}
+
+	for _, tc := range tt {
+
+		r := httptest.NewRequest(http.MethodGet, tc.url, nil)
+
+		// When.
+
+		q := Param{Get: r.URL.Query().Get}
+
+		// Then.
+
+		assert.Equal(t, tc.exp, q.Name("a").IntClamp(5, 10), tc.url)
+		assert.Nil(t, q.Err)
+	}
+}
+
 func TestParamTime(t *testing.T) {
 
 	// Given.

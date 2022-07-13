@@ -45,6 +45,12 @@ func (p *Param) Int() int {
 	return v
 }
 
+func (p *Param) IntClamp(min, max int) int {
+	v, err := p.val.IntClamp(min, max)
+	p.setErr(ErrInvalidValue, err)
+	return v
+}
+
 func (p *Param) Time(layout string) time.Time {
 	v, err := p.val.Time(layout)
 	p.setErr(ErrInvalidTime, err)

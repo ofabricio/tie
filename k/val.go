@@ -26,6 +26,17 @@ func (v Val) Int() (int, error) {
 	return strconv.Atoi(string(v))
 }
 
+func (v Val) IntClamp(min, max int) (int, error) {
+	i, err := v.Int()
+	if i < min {
+		return min, err
+	}
+	if i > max {
+		return max, err
+	}
+	return i, err
+}
+
 func (v Val) Time(layout string) (time.Time, error) {
 	if v.Empty() {
 		return time.Time{}, nil
