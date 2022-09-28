@@ -24,7 +24,7 @@ func With(kv ...any) opt.WriteFunc {
 
 func Body(v any) opt.WriteFunc {
 	return func(h http.Header) opt.BodyFunc {
-		h.Set("Content-Type", "application/json; charset=utf-8")
+		h.Set("Content-Type", "application/json")
 		return func(w io.Writer) error {
 			return json.NewEncoder(w).Encode(v)
 		}
@@ -33,7 +33,7 @@ func Body(v any) opt.WriteFunc {
 
 func ND[T any](ch <-chan T) opt.WriteFunc {
 	return func(h http.Header) opt.BodyFunc {
-		h.Set("Content-Type", "application/x-ndjson; charset=utf-8")
+		h.Set("Content-Type", "application/x-ndjson")
 		return func(w io.Writer) error {
 			enc := json.NewEncoder(w)
 			for v := range ch {

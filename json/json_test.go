@@ -48,7 +48,7 @@ func TestBody_With_Msg(t *testing.T) {
 		// Then.
 
 		assert.Nil(t, err)
-		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 		assert.JSONEq(t, tc.then, w.Body.String())
 	}
 }
@@ -77,7 +77,7 @@ func TestND(t *testing.T) {
 	// Then.
 
 	assert.Nil(t, err)
-	assert.Equal(t, "application/x-ndjson; charset=utf-8", w.Header().Get("Content-Type"))
+	assert.Equal(t, "application/x-ndjson", w.Header().Get("Content-Type"))
 	assert.Equal(t, "{\"name\":\"Mary\"}\n{\"name\":\"John\"}\n", w.Body.String())
 }
 
