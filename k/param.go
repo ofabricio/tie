@@ -31,6 +31,16 @@ func (p *Param) Required() *Param {
 	return p
 }
 
+func (p *Param) Lower() *Param {
+	p.val = p.val.Lower()
+	return p
+}
+
+func (p *Param) Upper() *Param {
+	p.val = p.val.Upper()
+	return p
+}
+
 func (p *Param) Split() []string {
 	return p.val.Split(",")
 }

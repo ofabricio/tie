@@ -12,6 +12,14 @@ func (v Val) Str() string {
 	return string(v)
 }
 
+func (v Val) Lower() Val {
+	return Val(strings.ToLower(string(v)))
+}
+
+func (v Val) Upper() Val {
+	return Val(strings.ToUpper(string(v)))
+}
+
 func (v Val) Split(sep string) []string {
 	if v.Empty() {
 		return nil

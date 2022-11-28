@@ -229,6 +229,56 @@ func TestParamDefault(t *testing.T) {
 	}
 }
 
+func TestParamLower(t *testing.T) {
+
+	// Given.
+
+	tt := []struct {
+		url string
+		exp []string
+	}{
+		{url: "/?a=Hello,WORLD", exp: []string{"hello", "world"}},
+	}
+
+	for _, tc := range tt {
+
+		r := httptest.NewRequest(http.MethodGet, tc.url, nil)
+
+		// When.
+
+		q := Param{Get: r.URL.Query().Get}
+
+		// Then.
+
+		assert.Equal(t, tc.exp, q.Name("a").Lower().Split(), tc.url)
+	}
+}
+
+func TestParamUpper(t *testing.T) {
+
+	// Given.
+
+	tt := []struct {
+		url string
+		exp []string
+	}{
+		{url: "/?a=Hello,world", exp: []string{"HELLO", "WORLD"}},
+	}
+
+	for _, tc := range tt {
+
+		r := httptest.NewRequest(http.MethodGet, tc.url, nil)
+
+		// When.
+
+		q := Param{Get: r.URL.Query().Get}
+
+		// Then.
+
+		assert.Equal(t, tc.exp, q.Name("a").Upper().Split(), tc.url)
+	}
+}
+
 func ExampleParam() {
 
 	r := httptest.NewRequest(http.MethodGet, "/?a=3&b=4,5,6", nil)
